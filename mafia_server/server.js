@@ -13,23 +13,23 @@ var io = new Server (server, {
   allowEIO3: true,
 })
 
+var joined = false
 var players = []
 var username
 
 io.on('connection', (socket) => {
-  var joined = false
   // 접속
   socket.on('join', (data) => {
     if (joined) {
       return false
     }
-
     username = data
     players.push(username)
     socket.emit('welcome', {
       'username': username,
       'players': players
     })
+    joined = true
   })
 
   // 접속 종료
@@ -40,11 +40,11 @@ io.on('connection', (socket) => {
 
     var idx = players.indexOf(username)
     players.splice(idx, 1)
-
     socket.emit('left', {
       'username': username,
       'players': players
     })
+    joined = false
   })
 })
 
