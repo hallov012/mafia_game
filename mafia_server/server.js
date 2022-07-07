@@ -13,11 +13,38 @@ var io = new Server (server, {
   allowEIO3: true,
 })
 
-io.on('connection', (socket) => {
-  console.log(`user ${socket.id} join.`)
+var players = []
+var username
 
+io.on('connection', (socket) => {
+  var joined = false
+  // 접속
+  socket.on('join', (data) => {
+    if (joined) {
+      return false
+    }
+
+    username = data
+    players.push(username)
+    socket.emit('welcome', {
+      'username': username,
+      'players': players
+    })
+  })
+
+  // 접속 종료
   socket.on('disconnect', () => {
-    console.log(`user ${socket.id} left`)
+    if (!joined) {
+      return false
+    }
+
+    var idx = players.indexOf(username)
+    players.splice(idx, 1)
+
+    socket.emit('left', {
+      'username': username,
+      'players': players
+    })
   })
 })
 
