@@ -13,11 +13,11 @@ var io = new Server (server, {
   allowEIO3: true,
 })
 
-var joined = false
 var players = []
-var username
 
 io.on('connection', (socket) => {
+  var joined = false
+  var username
   // 접속
   socket.on('join', (data) => {
     if (joined) {
@@ -29,6 +29,7 @@ io.on('connection', (socket) => {
       'username': username,
       'players': players
     })
+    console.log(players)
     joined = true
   })
 

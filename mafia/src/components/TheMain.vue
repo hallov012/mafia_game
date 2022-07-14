@@ -1,16 +1,18 @@
 <template>
   <div v-if="!joined" class="join_box">
-    <input v-model="currentUser" type="text" class="user-name">
+    <input v-model="currentUser" @keypress.enter="join" type="text" class="user-name">
     <button class="join-btn" @click="join">Join</button>
   </div>
   <div v-if="joined" class="game-box">
-    <h2>접속!</h2>
+    <UserList :userList = "userList" />
   </div>
 </template>
 
 <script>
 import { ref } from 'vue'
 import io from "socket.io-client"
+
+import UserList from '@/components/UserList.vue'
 
 const socket = io("http://localhost:3000", {
   transports: ['websocket'],
@@ -19,9 +21,13 @@ const socket = io("http://localhost:3000", {
 
 export default {
   name: "TheMain",
+  components: {
+    UserList
+  },
   setup() {
     const joined = ref(false)
     const currentUser = ref('')
+    const userList = ref([])
 
     const join = function () {
       if (currentUser.value) {
@@ -31,10 +37,10 @@ export default {
     }
 
     socket.on('welcome', function(data){
-      console.log(data)
+      userList.value = data
     })
 
-    return { joined, join, currentUser }
+    return { joined, join, currentUser, userList }
   }
 }
 </script>
